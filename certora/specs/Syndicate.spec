@@ -144,7 +144,14 @@ rule unstakingIncreasesSETHAmount() {
     address _unclaimedETHRecipient; address _sETHRecipient;
     bytes32 blsKey; uint256 sETHAmount;
 
-    unstake@withrevert(e, _unclaimedETHRecipient, _sETHRecipient, blsKey, sETHAmount);
+    require sETHAmount > 0;
+    require _sETHRecipient != currentContract;
 
-    assert !lastReverted;
+    uint _sETHBalance = sETHToken.balanceOf(_sETHRecipient);
+
+    unstake(e, _unclaimedETHRecipient, _sETHRecipient, blsKey, sETHAmount);
+
+    uint sETHBalance_ = sETHToken.balanceOf(_sETHRecipient);
+
+    assert sETHBalance_ > _sETHBalance;
 }
