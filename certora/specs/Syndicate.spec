@@ -136,3 +136,15 @@ rule getUnprocessedETHForAllCollateralizedSlot_dependsOnNumberOfKnots() {
 
     assert expected == actual;
 }
+
+
+
+rule unstakingIncreasesSETHAmount() {
+    env e;
+    address _unclaimedETHRecipient; address _sETHRecipient;
+    bytes32 blsKey; uint256 sETHAmount;
+
+    unstake@withrevert(e, _unclaimedETHRecipient, _sETHRecipient, blsKey, sETHAmount);
+
+    assert !lastReverted;
+}
