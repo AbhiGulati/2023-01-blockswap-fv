@@ -4,6 +4,12 @@ methods {
     //// Regular methods
     totalETHReceived() returns (uint256) envfree
     isKnotRegistered(bytes32) returns (bool) envfree
+    calculateETHForFreeFloatingOrCollateralizedHolders() returns (uint256) envfree;
+    lastSeenETHPerCollateralizedSlotPerKnot() returns (uint256) envfree;
+    numberOfRegisteredKnots() returns (uint256) envfree;
+    getUnprocessedETHForAllCollateralizedSlot() returns (uint256) envfree;
+
+
 
     //// Resolving external calls
 	// stakeHouseUniverse
@@ -117,3 +123,16 @@ rule totalEthReceivedMonotonicallyIncreases(method f) filtered {
  */
 invariant addressZeroHasNoBalance()
     sETHToken.balanceOf(0) == 0
+
+
+
+rule getUnprocessedETHForAllCollateralizedSlot_dependsOnNumberOfKnots() {
+    require numberOfRegisteredKnots() > 0;
+
+    uint diff = calculateETHForFreeFloatingOrCollateralizedHolders() - lastSeenETHPerCollateralizedSlotPerKnot();
+
+    uint actual = getUnprocessedETHForAllCollateralizedSlot();
+    uint expected = diff / numberOfRegisteredKnots();
+
+    assert expected == actual;
+}
