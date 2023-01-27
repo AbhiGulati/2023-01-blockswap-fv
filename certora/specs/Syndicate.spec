@@ -1,4 +1,4 @@
-using MocksETH as sETHToken
+using MocksETHReturnsFalse as sETHToken
 
 methods {
     //// Regular methods
