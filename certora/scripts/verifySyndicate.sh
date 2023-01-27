@@ -7,7 +7,7 @@ then
     RULE="--rule $2"
 fi
 
-solc-select use 0.8.13
+# solc-select use 0.8.13
 
 certoraRun  certora/harnesses/SyndicateHarness.sol \
     certora/harnesses/MockStakeHouseUniverse.sol \
