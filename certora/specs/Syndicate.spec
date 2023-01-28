@@ -5,10 +5,14 @@ methods {
     totalETHReceived() returns (uint256) envfree
     isKnotRegistered(bytes32) returns (bool) envfree
     calculateETHForFreeFloatingOrCollateralizedHolders() returns (uint256) envfree;
-    lastSeenETHPerCollateralizedSlotPerKnot() returns (uint256) envfree;
     numberOfRegisteredKnots() returns (uint256) envfree;
     getUnprocessedETHForAllCollateralizedSlot() returns (uint256) envfree;
 
+    lastSeenETHPerCollateralizedSlotPerKnot() returns (uint256) envfree;
+    lastSeenETHPerFreeFloating() returns (uint256) envfree;
+
+    // added harness calls
+    getSETHStakedBalanceForKnot(bytes32, address) returns (uint256) envfree;
 
 
     //// Resolving external calls
@@ -124,7 +128,8 @@ rule totalEthReceivedMonotonicallyIncreases(method f) filtered {
 invariant addressZeroHasNoBalance()
     sETHToken.balanceOf(0) == 0
 
-
+invariant addressZeroHasNoStakedBalance(bytes32 blsKey)
+    getSETHStakedBalanceForKnot(blsKey, 0) == 0
 
 rule getUnprocessedETHForAllCollateralizedSlot_dependsOnNumberOfKnots() {
     require numberOfRegisteredKnots() > 0;
@@ -136,7 +141,6 @@ rule getUnprocessedETHForAllCollateralizedSlot_dependsOnNumberOfKnots() {
 
     assert expected == actual;
 }
-
 
 
 rule unstakingIncreasesSETHAmount() {
@@ -155,3 +159,7 @@ rule unstakingIncreasesSETHAmount() {
 
     assert sETHBalance_ > _sETHBalance;
 }
+
+
+invariant ethForSlotTypesIsEqual()
+    lastSeenETHPerCollateralizedSlotPerKnot() == lastSeenETHPerFreeFloating()
