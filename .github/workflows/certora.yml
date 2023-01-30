@@ -72,18 +72,5 @@ jobs:
       fail-fast: false
       max-parallel: 4
       matrix:
-        params:
-          # each of these is passed to the "Verify rule" step above, which runs
-          # certoraRun on certora/configs/<contents of the line>
-          #
-          # Note that each of these lines will appear as a separate run on
-          # prover.certora.com
-          #
-          # It is often helpful to split up by rule or even by method for a
-          # parametric rule, although it is certainly possible to run everything
-          # at once by not passing the `--rule` or `--method` options
-          - Borda.conf --rule correctPointsIncreaseToContenders
-          - Borda.conf --rule onceBlackListedNotOut --method "vote(address,address,address)"
-          - Borda.conf
         rules:
           - unstakingIncreasesSETHAmount
