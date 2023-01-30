@@ -107,6 +107,13 @@ function sETHSolvencyCorrollary(address user1, address user2, bytes32 knot) retu
     return sETHStakedBalanceForKnot(knot,user1) + sETHStakedBalanceForKnot(knot,user2) <= sETHTotalStakeForKnot(knot);
 }
 
+
+/*
+ *******************************
+ * Verified
+ *******************************
+ */
+
 /**
  * An unregistered knot can not be deregistered.
  */
@@ -119,6 +126,24 @@ rule canNotDegisterUnregisteredKnot(method f) filtered {
     deRegisterKnots@withrevert(e, knot);
 
     assert lastReverted, "deRegisterKnots must revert if knot is not registered";
+}
+
+
+rule unstakingIncreasesSETHAmount() {
+    env e;
+    address _unclaimedETHRecipient; address _sETHRecipient;
+    bytes32 blsKey; uint256 sETHAmount;
+
+    require sETHAmount > 0;
+    require _sETHRecipient != currentContract;
+
+    uint _sETHBalance = sETHToken.balanceOf(_sETHRecipient);
+
+    unstake(e, _unclaimedETHRecipient, _sETHRecipient, blsKey, sETHAmount);
+
+    uint sETHBalance_ = sETHToken.balanceOf(_sETHRecipient);
+
+    assert sETHBalance_ > _sETHBalance;
 }
 
 /**
@@ -147,6 +172,14 @@ invariant addressZeroHasNoBalance()
 invariant addressZeroHasNoStakedBalance(bytes32 blsKey)
     getSETHStakedBalanceForKnot(blsKey, 0) == 0
 
+
+
+/*
+ *******************************
+ * Unverified or failing
+ *******************************
+ */
+
 rule getUnprocessedETHForAllCollateralizedSlot_dependsOnNumberOfKnots() {
     require numberOfRegisteredKnots() > 0;
 
@@ -158,23 +191,8 @@ rule getUnprocessedETHForAllCollateralizedSlot_dependsOnNumberOfKnots() {
     assert expected == actual;
 }
 
-
-rule unstakingIncreasesSETHAmount() {
-    env e;
-    address _unclaimedETHRecipient; address _sETHRecipient;
-    bytes32 blsKey; uint256 sETHAmount;
-
-    require sETHAmount > 0;
-    require _sETHRecipient != currentContract;
-
-    uint _sETHBalance = sETHToken.balanceOf(_sETHRecipient);
-
-    unstake(e, _unclaimedETHRecipient, _sETHRecipient, blsKey, sETHAmount);
-
-    uint sETHBalance_ = sETHToken.balanceOf(_sETHRecipient);
-
-    assert sETHBalance_ > _sETHBalance;
-}
+invariant noWhitelistNoStake(env e, address user, bytes32 blsKey)
+    e.block.number < priorityStakingEndBlock() && !isPriorityStaker(user) => getSETHStakedBalanceForKnot(blsKey, user) == 0
 
 // This invariant is not true
 // invariant ethForSlotTypesIsEqual()
@@ -186,6 +204,3 @@ rule unstakingIncreasesSETHAmount() {
 // Hm I don't have any way to see the change since before `deRegisterKnots` was
 // called vs after.
 
-
-invariant noWhitelistNoStake(env e, address user, bytes32 blsKey)
-    e.block.number < priorityStakingEndBlock() && !isPriorityStaker(user) => getSETHStakedBalanceForKnot(blsKey, user) == 0
