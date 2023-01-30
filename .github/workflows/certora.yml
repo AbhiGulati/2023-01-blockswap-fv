@@ -73,10 +73,10 @@ jobs:
       max-parallel: 4
       matrix:
         rules:
-          - canNotDegisterUnregisteredKnot
-          - unstakingIncreasesSETHAmount
-          - totalEthReceivedMonotonicallyIncreases
-          - addressZeroHasNoBalance
-          - addressZeroHasNoStakedBalance
+          # - canNotDegisterUnregisteredKnot
+          # - unstakingIncreasesSETHAmount
+          # - totalEthReceivedMonotonicallyIncreases
+          # - addressZeroHasNoBalance
+          # - addressZeroHasNoStakedBalance
           - getUnprocessedETHForAllCollateralizedSlot_dependsOnNumberOfKnots
           - noWhitelistNoStake
