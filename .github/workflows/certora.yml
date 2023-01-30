@@ -80,3 +80,4 @@ jobs:
           # - addressZeroHasNoStakedBalance
           - getUnprocessedETHForAllCollateralizedSlot_dependsOnNumberOfKnots
           - noWhitelistNoStake
+          - ethForSlotTypesIsEqualAfterUpdateAccrued

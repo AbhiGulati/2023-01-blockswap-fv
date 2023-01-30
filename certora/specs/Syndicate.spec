@@ -5,6 +5,7 @@ methods {
     totalETHReceived() returns (uint256) envfree
     calculateETHForFreeFloatingOrCollateralizedHolders() returns (uint256) envfree;
     getUnprocessedETHForAllCollateralizedSlot() returns (uint256) envfree;
+    updateAccruedETHPerShares() envfree;
 
     // public variables
     accumulatedETHPerFreeFloatingShare() returns (uint256) envfree;
@@ -198,6 +199,14 @@ invariant noWhitelistNoStake(env e, address user, bytes32 blsKey)
 // invariant ethForSlotTypesIsEqual()
 //     lastSeenETHPerCollateralizedSlotPerKnot() == lastSeenETHPerFreeFloating()
 
+
+rule ethForSlotTypesIsEqualAfterUpdateAccrued() {
+    require numberOfRegisteredKnots() > 0;
+
+    updateAccruedETHPerShares();
+
+    assert lastSeenETHPerCollateralizedSlotPerKnot() == lastSeenETHPerFreeFloating();
+}
 
 
 // invariant that after something is deregistered it can never receive ETH
