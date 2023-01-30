@@ -79,5 +79,4 @@ jobs:
           - addressZeroHasNoBalance
           - addressZeroHasNoStakedBalance
           - getUnprocessedETHForAllCollateralizedSlot_dependsOnNumberOfKnots
-          - unstakingIncreasesSETHAmount
           - noWhitelistNoStake
