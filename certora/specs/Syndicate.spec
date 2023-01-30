@@ -174,13 +174,6 @@ invariant addressZeroHasNoStakedBalance(bytes32 blsKey)
     getSETHStakedBalanceForKnot(blsKey, 0) == 0
 
 
-
-/*
- *******************************
- * Unverified or failing
- *******************************
- */
-
 rule getUnprocessedETHForAllCollateralizedSlot_dependsOnNumberOfKnots() {
     require numberOfRegisteredKnots() > 0;
 
@@ -191,6 +184,13 @@ rule getUnprocessedETHForAllCollateralizedSlot_dependsOnNumberOfKnots() {
 
     assert expected == actual;
 }
+
+/*
+ *******************************
+ * Unverified or failing
+ *******************************
+ */
+
 
 invariant noWhitelistNoStake(env e, address user, bytes32 blsKey)
     e.block.number < priorityStakingEndBlock() && !isPriorityStaker(user) => getSETHStakedBalanceForKnot(blsKey, user) == 0
