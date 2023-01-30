@@ -180,19 +180,19 @@ contract Syndicate is ISyndicateInit, Initializable, Ownable, ReentrancyGuard, S
         // Fee recipient should be re-assigned in the event that happens as any further ETH can be collected by owner
         if (numberOfRegisteredKnots > 0) {
             // All time, total ETH that was earned per slot type (free floating or collateralized)
-            uint256 cumulativeEthHalf = calculateCumulativeEthHalf();
+            uint256 totalEthPerSlotType = calculateETHForFreeFloatingOrCollateralizedHolders();
 
             // Process free floating if there are staked shares
             uint256 freeFloatingUnprocessed;
             if (totalFreeFloatingShares > 0) {
                 freeFloatingUnprocessed = getUnprocessedETHForAllFreeFloatingSlot();
                 accumulatedETHPerFreeFloatingShare += _calculateNewAccumulatedETHPerFreeFloatingShare(freeFloatingUnprocessed);
-                lastSeenETHPerFreeFloating = cumulativeEthHalf;
+                lastSeenETHPerFreeFloating = totalEthPerSlotType;
             }
 
-            uint256 collateralizedUnprocessed = ((cumulativeEthHalf - lastSeenETHPerCollateralizedSlotPerKnot) / numberOfRegisteredKnots);
+            uint256 collateralizedUnprocessed = ((totalEthPerSlotType - lastSeenETHPerCollateralizedSlotPerKnot) / numberOfRegisteredKnots);
             accumulatedETHPerCollateralizedSlotPerKnot += collateralizedUnprocessed;
-            lastSeenETHPerCollateralizedSlotPerKnot = cumulativeEthHalf;
+            lastSeenETHPerCollateralizedSlotPerKnot = totalEthPerSlotType;
 
             emit UpdateAccruedETH(freeFloatingUnprocessed + collateralizedUnprocessed);
         }
@@ -385,7 +385,7 @@ contract Syndicate is ISyndicateInit, Initializable, Ownable, ReentrancyGuard, S
     }
 
     /// @notice Using `highestSeenBalance`, this is the amount that is separately allocated to either free floating or collateralized SLOT holders
-    function calculateCumulativeEthHalf() public view returns (uint256) {
+    function calculateETHForFreeFloatingOrCollateralizedHolders() public view returns (uint256) {
         // Get total amount of ETH that can be drawn down by all SLOT holders associated with a knot
         uint256 ethPerKnot = totalETHReceived();
 
@@ -447,7 +447,7 @@ contract Syndicate is ISyndicateInit, Initializable, Ownable, ReentrancyGuard, S
     ) public view returns (uint256) {
         // Per collateralized SLOT per KNOT before distributing to individual collateralized owners
         uint256 accumulatedSoFar = accumulatedETHPerCollateralizedSlotPerKnot
-                    + ((calculateCumulativeEthHalf() - lastSeenETHPerCollateralizedSlotPerKnot) / numberOfRegisteredKnots);
+                    + ((calculateETHForFreeFloatingOrCollateralizedHolders() - lastSeenETHPerCollateralizedSlotPerKnot) / numberOfRegisteredKnots);
 
         uint256 unprocessedForKnot = accumulatedSoFar - totalETHProcessedPerCollateralizedKnot[_blsPubKey];
 
@@ -483,12 +483,12 @@ contract Syndicate is ISyndicateInit, Initializable, Ownable, ReentrancyGuard, S
 
     /// @notice Amount of ETH per free floating share that hasn't yet been allocated to each share
     function getUnprocessedETHForAllFreeFloatingSlot() public view returns (uint256) {
-        return calculateCumulativeEthHalf() - lastSeenETHPerFreeFloating;
+        return calculateETHForFreeFloatingOrCollateralizedHolders() - lastSeenETHPerFreeFloating;
     }
 
     /// @notice Amount of ETH per collateralized share that hasn't yet been allocated to each share
     function getUnprocessedETHForAllCollateralizedSlot() public view returns (uint256) {
-        return ((calculateCumulativeEthHalf() - lastSeenETHPerCollateralizedSlotPerKnot) / numberOfRegisteredKnots);
+        return ((calculateETHForFreeFloatingOrCollateralizedHolders() - lastSeenETHPerCollateralizedSlotPerKnot) / numberOfRegisteredKnots);
     }
 
     /// @notice New accumulated ETH per free floating share that hasn't yet been applied
@@ -580,7 +580,7 @@ contract Syndicate is ISyndicateInit, Initializable, Ownable, ReentrancyGuard, S
     }
 
     function _calculateCollateralizedETHOwedPerKnot() internal view returns (uint256) {
-        uint256 collateralizedSLOTShareOfETH = calculateCumulativeEthHalf();
+        uint256 collateralizedSLOTShareOfETH = calculateETHForFreeFloatingOrCollateralizedHolders();
         uint256 collateralizedSLOTShareOfETHPerKnot = (collateralizedSLOTShareOfETH / numberOfRegisteredKnots);
         return collateralizedSLOTShareOfETHPerKnot;
     }
