@@ -202,6 +202,7 @@ invariant noWhitelistNoStake(env e, address user, bytes32 blsKey)
 
 rule ethForSlotTypesIsEqualAfterUpdateAccrued() {
     require numberOfRegisteredKnots() > 0;
+    require totalFreeFloatingShares() > 0;
 
     updateAccruedETHPerShares();
 

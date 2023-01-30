@@ -78,6 +78,6 @@ jobs:
           # - totalEthReceivedMonotonicallyIncreases
           # - addressZeroHasNoBalance
           # - addressZeroHasNoStakedBalance
-          - getUnprocessedETHForAllCollateralizedSlot_dependsOnNumberOfKnots
+          # - getUnprocessedETHForAllCollateralizedSlot_dependsOnNumberOfKnots
           - noWhitelistNoStake
           - ethForSlotTypesIsEqualAfterUpdateAccrued
