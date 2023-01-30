@@ -176,6 +176,16 @@ rule unstakingIncreasesSETHAmount() {
     assert sETHBalance_ > _sETHBalance;
 }
 
+// This invariant is not true
+// invariant ethForSlotTypesIsEqual()
+//     lastSeenETHPerCollateralizedSlotPerKnot() == lastSeenETHPerFreeFloating()
 
-invariant ethForSlotTypesIsEqual()
-    lastSeenETHPerCollateralizedSlotPerKnot() == lastSeenETHPerFreeFloating()
+
+
+// invariant that after something is deregistered it can never receive ETH
+// Hm I don't have any way to see the change since before `deRegisterKnots` was
+// called vs after.
+
+
+invariant noWhitelistNoStake(env e, address user, bytes32 blsKey)
+    e.block.number < priorityStakingEndBlock() && !isPriorityStaker(user) => getSETHStakedBalanceForKnot(blsKey, user) == 0
