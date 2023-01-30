@@ -3,13 +3,29 @@ using MocksETHReturnsFalse as sETHToken
 methods {
     //// Regular methods
     totalETHReceived() returns (uint256) envfree
-    isKnotRegistered(bytes32) returns (bool) envfree
     calculateETHForFreeFloatingOrCollateralizedHolders() returns (uint256) envfree;
-    numberOfRegisteredKnots() returns (uint256) envfree;
     getUnprocessedETHForAllCollateralizedSlot() returns (uint256) envfree;
 
+    // public variables
+    accumulatedETHPerFreeFloatingShare() returns (uint256) envfree;
+    accumulatedETHPerCollateralizedSlotPerKnot() returns (uint256) envfree;
     lastSeenETHPerCollateralizedSlotPerKnot() returns (uint256) envfree;
     lastSeenETHPerFreeFloating() returns (uint256) envfree;
+    totalFreeFloatingShares() returns (uint256) envfree;
+    totalClaimed() returns (uint256) envfree;
+    numberOfRegisteredKnots() returns (uint256) envfree;
+    isKnotRegistered(bytes32) returns (bool) envfree;
+    priorityStakingEndBlock() returns (uint256) envfree;
+    isPriorityStaker(address) returns (bool) envfree;
+    // sETHTotalStakeForKnot(bytes32) returns (uint256) envfree;
+    // sETHStakedBalanceForKnot() returns () envfree; // new getter needed
+    // sETHUserClaimForKnot() returns () envfree; // new getter needed
+    // totalETHProcessedPerCollateralizedKnot(bytes32) returns (uint256) envfree; // apparently this is harnessed
+    // accruedEarningPerCollateralizedSlotOwnerOfKnot // new getter needed (?)
+    // claimedPerCollateralizedSlotOwnerOfKnot // new getter needed (?)
+    isNoLongerPartOfSyndicate(bytes32) returns (bool) envfree;
+    lastAccumulatedETHPerFreeFloatingShare(bytes32) returns (uint256) envfree;
+
 
     // added harness calls
     getSETHStakedBalanceForKnot(bytes32, address) returns (uint256) envfree;
