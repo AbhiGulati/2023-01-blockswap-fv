@@ -206,7 +206,7 @@ invariant noWhitelistNoStake(env e, address user, bytes32 blsKey)
 
 
 invariant numberOfRegisteredKnotsIs0MeansNoRegisteredKnots(bytes32 blsKey)
-    numberOfRegisteredKnots() == 0 => !isKnotRegistered(blsKey) || isNoLongerPartOfSyndicate(_blsPublicKey)
+    numberOfRegisteredKnots() == 0 => !isKnotRegistered(blsKey) || isNoLongerPartOfSyndicate(blsKey)
 
 // This invariant is not true
 // invariant ethForSlotTypesIsEqual()
