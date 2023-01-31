@@ -136,5 +136,9 @@ contract SyndicateHarness is Syndicate {
     function getSETHStakedBalanceForKnot(blsKey _blsPubKey, address user) public view returns (uint) {
         return sETHStakedBalanceForKnot[_blsPubKey][user];
     }
+
+    function getETHBalance(address user) public view returns (uint) {
+        return user.balance;
+    }
 }
 

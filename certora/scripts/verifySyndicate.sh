@@ -23,4 +23,5 @@ certoraRun  certora/harnesses/SyndicateHarness.sol \
     --rule_sanity \
     --settings -optimisticFallback=true \
     --packages @blockswaplab=node_modules/@blockswaplab @openzeppelin=node_modules/@openzeppelin \
-    --msg "Syndicate $1 $2"
+    --msg "Syndicate $1 $2" \
+    $3
