@@ -2,6 +2,13 @@
 
 f="certora/tests/certora/bug1.patch"
 
+if [[ "$1" ]]
+then
+    MSG="$1"
+else
+    MSG="msg"
+fi
+
 echo "Applying $f"
 git apply $f;
 echo "Running script"
@@ -10,6 +17,6 @@ echo "Running script"
 #     echo "Running $script"
 #     sh $script
 # done
-certora/scripts/verifySyndicate.sh msg unstakingIncreasesSETHAmount
+certora/scripts/verifySyndicate.sh "$MSG" unstakingIncreasesSETHAmount
 echo "Reverting $f"
 git apply -R $f
