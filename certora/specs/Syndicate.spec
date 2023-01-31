@@ -194,7 +194,6 @@ rule ethForSlotTypesIsEqualAfterUpdateAccrued() {
     assert lastSeenETHPerCollateralizedSlotPerKnot() == lastSeenETHPerFreeFloating();
 }
 
-
 /*
  *******************************
  * Unverified or failing
@@ -204,6 +203,10 @@ rule ethForSlotTypesIsEqualAfterUpdateAccrued() {
 
 invariant noWhitelistNoStake(env e, address user, bytes32 blsKey)
     e.block.number < priorityStakingEndBlock() && !isPriorityStaker(user) => getSETHStakedBalanceForKnot(blsKey, user) == 0
+
+
+invariant numberOfRegisteredKnotsIs0MeansNoRegisteredKnots(bytes32 blsKey)
+    numberOfRegisteredKnots() == 0 => !isKnotRegistered(blsKey)
 
 // This invariant is not true
 // invariant ethForSlotTypesIsEqual()
