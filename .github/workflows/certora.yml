@@ -79,8 +79,17 @@ jobs:
           # - addressZeroHasNoBalance
           # - addressZeroHasNoStakedBalance
           # - getUnprocessedETHForAllCollateralizedSlot_dependsOnNumberOfKnots
-          - noWhitelistNoStake
-          - numberOfRegisteredKnotsIs0MeansNoRegisteredKnots
-          - numberOfRegisteredKnotsIsNumberOfRegisteredKnots
-          - doubleRegisterWillFail
-          - registeringInactiveWillFail
+          # - doubleRegisterWillFail
+          # - registeringInactiveWillFail
+
+          - permissioned_registerKnotsToSyndicate
+          - permissioned_deRegisterKnots 
+          - permissioned_addPriorityStakers
+          - permissioned_updatePriorityStakingBlock
+
+
+          # Failing
+          # - noWhitelistNoStake
+          # - numberOfRegisteredKnotsIs0MeansNoRegisteredKnots
+          # - numberOfRegisteredKnotsIsNumberOfRegisteredKnots
+

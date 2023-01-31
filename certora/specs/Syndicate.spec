@@ -6,6 +6,7 @@ methods {
     calculateETHForFreeFloatingOrCollateralizedHolders() returns (uint256) envfree;
     getUnprocessedETHForAllCollateralizedSlot() returns (uint256) envfree;
     updateAccruedETHPerShares() envfree;
+    updatePriorityStakingBlock(uint256);
 
     // public variables
     owner() returns (address) envfree;
@@ -122,7 +123,7 @@ function sETHSolvencyCorrollary(address user1, address user2, bytes32 knot) retu
 /**
  * An unregistered knot can not be deregistered.
  */
-rule canNotDegisterUnregisteredKnot(method f) filtered {
+rule canNotDeregisterUnregisteredKnot(method f) filtered {
     f -> notHarnessCall(f)
 } {
     bytes32 knot; env e;
@@ -217,6 +218,28 @@ rule claimAsStakerUpdatesAccrued() {
     assert userBalance1 == userBalance2;
 }
 
+rule doubleRegisterWillFail() {
+    env e;
+    bytes32 blsKey;
+    registerKnotsToSyndicate(e, blsKey);
+
+    registerKnotsToSyndicate@withrevert(e, blsKey);
+
+    assert lastReverted;
+}
+
+rule registeringInactiveWillFail() {
+    env e;
+    bytes32 blsKey;
+
+    require !getIsActiveKnot(blsKey);
+
+    registerKnotsToSyndicate@withrevert(e, blsKey);
+
+    assert lastReverted;
+}
+
+
 /*
  *******************************
  * Unverified or failing
@@ -281,29 +304,23 @@ invariant numberOfRegisteredKnotsIsNumberOfRegisteredKnots(bytes32 blsKey)
 // called vs after.
 
 
-rule doubleRegisterWillFail() {
-    env e;
-    bytes32 blsKey;
-    registerKnotsToSyndicate(e, blsKey);
-
-    registerKnotsToSyndicate@withrevert(e, blsKey);
-
-    assert lastReverted;
-}
-
-rule registeringInactiveWillFail() {
-    env e;
-    bytes32 blsKey;
-
-    require !getIsActiveKnot(blsKey);
-
-    registerKnotsToSyndicate@withrevert(e, blsKey);
-
-    assert lastReverted;
-}
-
 rule permissioned_registerKnotsToSyndicate(env e, bytes32 blsKey) {
     registerKnotsToSyndicate(e, blsKey);
 
+    assert e.msg.sender == owner();
+}
+
+rule permissioned_deRegisterKnots(env e, bytes32 blsKey) {
+    deRegisterKnots(e, blsKey);
+    assert e.msg.sender == owner();
+}
+
+rule permissioned_addPriorityStakers(env e, address user) {
+    addPriorityStakers(e, user);
+    assert e.msg.sender == owner();
+}
+
+rule permissioned_updatePriorityStakingBlock(env e, uint256 endBlock) {
+    updatePriorityStakingBlock(e, endBlock);
     assert e.msg.sender == owner();
 }
