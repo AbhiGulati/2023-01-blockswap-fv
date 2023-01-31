@@ -83,3 +83,4 @@ jobs:
           - numberOfRegisteredKnotsIs0MeansNoRegisteredKnots
           - numberOfRegisteredKnotsIsNumberOfRegisteredKnots
           - doubleRegisterWillFail
+          - registeringInactiveWillFail
