@@ -81,3 +81,5 @@ jobs:
           # - getUnprocessedETHForAllCollateralizedSlot_dependsOnNumberOfKnots
           - noWhitelistNoStake
           - numberOfRegisteredKnotsIs0MeansNoRegisteredKnots
+          - numberOfRegisteredKnotsIsNumberOfRegisteredKnots
+          - doubleRegisterWillFail
