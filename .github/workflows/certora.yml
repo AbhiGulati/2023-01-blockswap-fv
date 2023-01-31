@@ -82,3 +82,4 @@ jobs:
           - noWhitelistNoStake
           - numberOfRegisteredKnotsIs0MeansNoRegisteredKnots
           - claimAsStakerUpdatesAccrued
+          - numberOfRegisteredKnotsIsNumberOfRegisteredKnots

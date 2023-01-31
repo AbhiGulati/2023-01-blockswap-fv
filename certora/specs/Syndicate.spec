@@ -196,6 +196,25 @@ rule ethForSlotTypesIsEqualAfterUpdateAccrued() {
     assert lastSeenETHPerCollateralizedSlotPerKnot() == lastSeenETHPerFreeFloating();
 }
 
+
+rule claimAsStakerUpdatesAccrued() {
+    env e;
+    address user;
+    bytes32 blsKey1;
+    bytes32 blsKey2;
+
+    storage init = lastStorage;
+
+    claimAsStaker(e, user, blsKey1, blsKey2);
+    uint userBalance1 = getETHBalance(user);
+
+    updateAccruedETHPerShares() at init;
+    claimAsStaker(e, user, blsKey1, blsKey2);
+    uint userBalance2 = getETHBalance(user);
+
+    assert userBalance1 == userBalance2;
+}
+
 /*
  *******************************
  * Unverified or failing
@@ -218,6 +237,12 @@ ghost mapping(bytes32 => bool) is_NoLongerPartOfSyndicate;
 
 hook Sstore isNoLongerPartOfSyndicate[KEY bytes32 a] bool new_value (bool old_value) STORAGE {
     is_NoLongerPartOfSyndicate[a] = new_value;
+
+    if (new_value && !old_value && isKnotRegistered[a]) {
+        number_registered_knots = number_registered_knots - 1;
+    } else if (!new_value && old_value && isKnotRegistered[a]) {
+        number_registered_knots = number_registered_knots + 1;
+    }
 }
 
 hook Sload bool new_value isNoLongerPartOfSyndicate[KEY bytes32 a] STORAGE {
@@ -227,29 +252,15 @@ hook Sload bool new_value isNoLongerPartOfSyndicate[KEY bytes32 a] STORAGE {
 hook Sstore isKnotRegistered[KEY bytes32 a] bool new_value (bool old_value) STORAGE {
     if (new_value && !old_value && !is_NoLongerPartOfSyndicate[a]) {
         number_registered_knots = number_registered_knots + 1;
+    } else if (!new_value && old_value && !is_NoLongerPartOfSyndicate) {
+        number_registered_knots = number_registered_knots - 1;
     }
 }
 
-// invariant numberOfRegisteredKnotsIsNumberOfRegisteredKnots(bytes32 blsKey)
+invariant numberOfRegisteredKnotsIsNumberOfRegisteredKnots(bytes32 blsKey)
+    numberOfRegisteredKnots() == number_registered_knots
 
 
-rule claimAsStakerUpdatesAccrued() {
-    env e;
-    address user;
-    bytes32 blsKey1;
-    bytes32 blsKey2;
-
-    storage init = lastStorage;
-
-    claimAsStaker(e, user, blsKey1, blsKey2);
-    uint userBalance1 = getETHBalance(user);
-
-    updateAccruedETHPerShares() at init;
-    claimAsStaker(e, user, blsKey1, blsKey2);
-    uint userBalance2 = getETHBalance(user);
-
-    assert userBalance1 == userBalance2;
-}
 
 // invariant that after something is deregistered it can never receive ETH
 // Hm I don't have any way to see the change since before `deRegisterKnots` was
