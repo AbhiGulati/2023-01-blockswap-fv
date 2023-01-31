@@ -270,7 +270,7 @@ invariant noWhitelistNoStake(env e, address user, bytes32 blsKey)
     e.block.number < priorityStakingEndBlock() && !isPriorityStaker(user) => getSETHStakedBalanceForKnot(blsKey, user) == 0
 
     {preserved with (env e1) {
-        require e1 == e;
+        require e1.block.number == e.block.number;
     }}
 
 
