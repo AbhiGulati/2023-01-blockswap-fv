@@ -81,3 +81,4 @@ jobs:
           # - getUnprocessedETHForAllCollateralizedSlot_dependsOnNumberOfKnots
           - noWhitelistNoStake
           - numberOfRegisteredKnotsIs0MeansNoRegisteredKnots
+          - claimAsStakerUpdatesAccrued

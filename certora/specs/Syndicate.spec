@@ -44,6 +44,8 @@ methods {
 	numberOfCollateralisedSlotOwnersForKnot(bytes32) returns (uint256)  => DISPATCHER(true)
 	getCollateralisedOwnerAtIndex(bytes32, uint256) returns (address) => DISPATCHER(true)
 	totalUserCollateralisedSLOTBalanceForKnot(address, address, bytes32) returns (uint256) => DISPATCHER(true)
+    getETHBalance(address) returns (uint) envfree;
+
     // sETH
     sETHToken.balanceOf(address) returns (uint256) envfree
     // ERC20
@@ -208,12 +210,24 @@ invariant noWhitelistNoStake(env e, address user, bytes32 blsKey)
 invariant numberOfRegisteredKnotsIs0MeansNoRegisteredKnots(bytes32 blsKey)
     numberOfRegisteredKnots() == 0 => !isKnotRegistered(blsKey) || isNoLongerPartOfSyndicate(blsKey)
 
-// This invariant is not true
-// invariant ethForSlotTypesIsEqual()
-//     lastSeenETHPerCollateralizedSlotPerKnot() == lastSeenETHPerFreeFloating()
 
+rule claimAsStakerUpdatesAccrued() {
+    env e;
+    address user;
+    bytes32 blsKey1;
+    bytes32 blsKey2;
 
+    storage init = lastStorage;
 
+    claimAsStaker(e, user, blsKey1, blsKey2);
+    uint userBalance1 = getETHBalance(user);
+
+    updateAccruedETHPerShares() at init;
+    claimAsStaker(e, user, blsKey1, blsKey2);
+    uint userBalance2 = getETHBalance(user);
+
+    assert userBalance1 == userBalance2;
+}
 
 // invariant that after something is deregistered it can never receive ETH
 // Hm I don't have any way to see the change since before `deRegisterKnots` was
