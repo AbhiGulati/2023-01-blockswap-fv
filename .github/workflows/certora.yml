@@ -85,10 +85,11 @@ jobs:
           # - permissioned_deRegisterKnots 
           # - permissioned_addPriorityStakers
           # - permissioned_updatePriorityStakingBlock
+          # - noWhitelistNoStake
 
 
           # Failing
-          - noWhitelistNoStake
+          
           # - numberOfRegisteredKnotsIs0MeansNoRegisteredKnots
-          # - numberOfRegisteredKnotsIsNumberOfRegisteredKnots
+          - numberOfRegisteredKnotsIsNumberOfRegisteredKnots
 
