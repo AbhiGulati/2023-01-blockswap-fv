@@ -77,8 +77,8 @@ methods {
     claimAsStaker(address,bytes32,bytes32)
     claimAsCollateralizedSLOTOwner(address,bytes32)
     claimAsCollateralizedSLOTOwner(address,bytes32,bytes32)
-    registerKnotsToSyndicate(bytes32) envfree;
-    registerKnotsToSyndicate(bytes32,bytes32) envfree;
+    registerKnotsToSyndicate(bytes32)
+    registerKnotsToSyndicate(bytes32,bytes32)
     addPriorityStakers(address)
     addPriorityStakers(address,address)
     batchUpdateCollateralizedSlotOwnersAccruedETH(bytes32)
@@ -279,20 +279,28 @@ invariant numberOfRegisteredKnotsIsNumberOfRegisteredKnots(bytes32 blsKey)
 
 
 rule doubleRegisterWillFail() {
+    env e;
     bytes32 blsKey;
-    registerKnotsToSyndicate(blsKey);
+    registerKnotsToSyndicate(e, blsKey);
 
-    registerKnotsToSyndicate@withrevert(blsKey);
+    registerKnotsToSyndicate@withrevert(e, blsKey);
 
     assert lastReverted;
 }
 
 rule registeringInactiveWillFail() {
+    env e;
     bytes32 blsKey;
 
     require !getIsActiveKnot(blsKey);
 
-    registerKnotsToSyndicate@withrevert(blsKey);
+    registerKnotsToSyndicate@withrevert(e, blsKey);
 
     assert lastReverted;
 }
+
+// rule permissioned_registerKnotsToSyndicate(env e, bytes32 blsKey) {
+//     registerKnotsToSyndicate(e, blsKey);
+
+
+// }
