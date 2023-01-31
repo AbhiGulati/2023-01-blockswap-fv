@@ -185,6 +185,16 @@ rule getUnprocessedETHForAllCollateralizedSlot_dependsOnNumberOfKnots() {
     assert expected == actual;
 }
 
+rule ethForSlotTypesIsEqualAfterUpdateAccrued() {
+    require numberOfRegisteredKnots() > 0;
+    require totalFreeFloatingShares() > 0;
+
+    updateAccruedETHPerShares();
+
+    assert lastSeenETHPerCollateralizedSlotPerKnot() == lastSeenETHPerFreeFloating();
+}
+
+
 /*
  *******************************
  * Unverified or failing
@@ -200,14 +210,6 @@ invariant noWhitelistNoStake(env e, address user, bytes32 blsKey)
 //     lastSeenETHPerCollateralizedSlotPerKnot() == lastSeenETHPerFreeFloating()
 
 
-rule ethForSlotTypesIsEqualAfterUpdateAccrued() {
-    require numberOfRegisteredKnots() > 0;
-    require totalFreeFloatingShares() > 0;
-
-    updateAccruedETHPerShares();
-
-    assert lastSeenETHPerCollateralizedSlotPerKnot() == lastSeenETHPerFreeFloating();
-}
 
 
 // invariant that after something is deregistered it can never receive ETH
