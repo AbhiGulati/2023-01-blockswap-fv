@@ -81,15 +81,14 @@ jobs:
           # - getUnprocessedETHForAllCollateralizedSlot_dependsOnNumberOfKnots
           # - doubleRegisterWillFail
           # - registeringInactiveWillFail
-
-          - permissioned_registerKnotsToSyndicate
-          - permissioned_deRegisterKnots 
-          - permissioned_addPriorityStakers
-          - permissioned_updatePriorityStakingBlock
+          # - permissioned_registerKnotsToSyndicate
+          # - permissioned_deRegisterKnots 
+          # - permissioned_addPriorityStakers
+          # - permissioned_updatePriorityStakingBlock
 
 
           # Failing
-          # - noWhitelistNoStake
+          - noWhitelistNoStake
           # - numberOfRegisteredKnotsIs0MeansNoRegisteredKnots
           # - numberOfRegisteredKnotsIsNumberOfRegisteredKnots
 

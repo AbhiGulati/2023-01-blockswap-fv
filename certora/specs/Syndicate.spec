@@ -239,6 +239,26 @@ rule registeringInactiveWillFail() {
     assert lastReverted;
 }
 
+rule permissioned_registerKnotsToSyndicate(env e, bytes32 blsKey) {
+    registerKnotsToSyndicate(e, blsKey);
+
+    assert e.msg.sender == owner();
+}
+
+rule permissioned_deRegisterKnots(env e, bytes32 blsKey) {
+    deRegisterKnots(e, blsKey);
+    assert e.msg.sender == owner();
+}
+
+rule permissioned_addPriorityStakers(env e, address user) {
+    addPriorityStakers(e, user);
+    assert e.msg.sender == owner();
+}
+
+rule permissioned_updatePriorityStakingBlock(env e, uint256 endBlock) {
+    updatePriorityStakingBlock(e, endBlock);
+    assert e.msg.sender == owner();
+}
 
 /*
  *******************************
@@ -303,24 +323,3 @@ invariant numberOfRegisteredKnotsIsNumberOfRegisteredKnots(bytes32 blsKey)
 // Hm I don't have any way to see the change since before `deRegisterKnots` was
 // called vs after.
 
-
-rule permissioned_registerKnotsToSyndicate(env e, bytes32 blsKey) {
-    registerKnotsToSyndicate(e, blsKey);
-
-    assert e.msg.sender == owner();
-}
-
-rule permissioned_deRegisterKnots(env e, bytes32 blsKey) {
-    deRegisterKnots(e, blsKey);
-    assert e.msg.sender == owner();
-}
-
-rule permissioned_addPriorityStakers(env e, address user) {
-    addPriorityStakers(e, user);
-    assert e.msg.sender == owner();
-}
-
-rule permissioned_updatePriorityStakingBlock(env e, uint256 endBlock) {
-    updatePriorityStakingBlock(e, endBlock);
-    assert e.msg.sender == owner();
-}
