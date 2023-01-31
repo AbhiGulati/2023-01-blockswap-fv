@@ -158,7 +158,6 @@ rule unstakingIncreasesSETHAmount() {
 rule totalEthReceivedMonotonicallyIncreases(method f) filtered {
     f -> notHarnessCall(f)
 }{
-    
     uint256 totalEthReceivedBefore = totalETHReceived();
 
     env e; calldataarg args;
