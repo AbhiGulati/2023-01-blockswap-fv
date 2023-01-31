@@ -210,6 +210,28 @@ invariant noWhitelistNoStake(env e, address user, bytes32 blsKey)
 invariant numberOfRegisteredKnotsIs0MeansNoRegisteredKnots(bytes32 blsKey)
     numberOfRegisteredKnots() == 0 => !isKnotRegistered(blsKey) || isNoLongerPartOfSyndicate(blsKey)
 
+ghost mathint number_registered_knots {
+    init_state axiom number_registered_knots == 0;
+}
+
+ghost mapping(bytes32 => bool) is_NoLongerPartOfSyndicate;
+
+hook Sstore isNoLongerPartOfSyndicate[KEY bytes32 a] bool new_value (bool old_value) STORAGE {
+    is_NoLongerPartOfSyndicate[a] = new_value;
+}
+
+hook Sload bool new_value isNoLongerPartOfSyndicate[KEY bytes32 a] STORAGE {
+    is_NoLongerPartOfSyndicate[a] = new_value;
+}
+
+hook Sstore isKnotRegistered[KEY bytes32 a] bool new_value (bool old_value) STORAGE {
+    if (new_value && !old_value && !is_NoLongerPartOfSyndicate[a]) {
+        number_registered_knots = number_registered_knots + 1;
+    }
+}
+
+// invariant numberOfRegisteredKnotsIsNumberOfRegisteredKnots(bytes32 blsKey)
+
 
 rule claimAsStakerUpdatesAccrued() {
     env e;
