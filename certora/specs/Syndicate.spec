@@ -30,6 +30,7 @@ methods {
 
     // added harness calls
     getSETHStakedBalanceForKnot(bytes32, address) returns (uint256) envfree;
+    getIsActiveKnot(bytes32) returns (bool) envfree;
 
 
     //// Resolving external calls
@@ -280,6 +281,16 @@ invariant numberOfRegisteredKnotsIsNumberOfRegisteredKnots(bytes32 blsKey)
 rule doubleRegisterWillFail() {
     bytes32 blsKey;
     registerKnotsToSyndicate(blsKey);
+
+    registerKnotsToSyndicate@withrevert(blsKey);
+
+    assert lastReverted;
+}
+
+rule registeringInactiveWillFail() {
+    bytes32 blsKey;
+
+    require !getIsActiveKnot(blsKey);
 
     registerKnotsToSyndicate@withrevert(blsKey);
 
