@@ -221,9 +221,12 @@ rule claimAsStakerUpdatesAccrued() {
  *******************************
  */
 
-
 invariant noWhitelistNoStake(env e, address user, bytes32 blsKey)
     e.block.number < priorityStakingEndBlock() && !isPriorityStaker(user) => getSETHStakedBalanceForKnot(blsKey, user) == 0
+
+    {preserved with (env e1) {
+        require e1 == e;
+    }}
 
 
 // invariant numberOfRegisteredKnotsIs0MeansNoRegisteredKnots(bytes32 blsKey)
