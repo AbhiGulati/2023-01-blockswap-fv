@@ -8,6 +8,7 @@ methods {
     updateAccruedETHPerShares() envfree;
 
     // public variables
+    owner() returns (address) envfree;
     accumulatedETHPerFreeFloatingShare() returns (uint256) envfree;
     accumulatedETHPerCollateralizedSlotPerKnot() returns (uint256) envfree;
     lastSeenETHPerCollateralizedSlotPerKnot() returns (uint256) envfree;
@@ -233,6 +234,8 @@ invariant noWhitelistNoStake(env e, address user, bytes32 blsKey)
 // invariant numberOfRegisteredKnotsIs0MeansNoRegisteredKnots(bytes32 blsKey)
 //     numberOfRegisteredKnots() == 0 => !isKnotRegistered(blsKey) || isNoLongerPartOfSyndicate(blsKey)
 
+
+/* this all goes together
 ghost mathint number_registered_knots {
     init_state axiom number_registered_knots == 0;
 }
@@ -270,7 +273,7 @@ hook Sload bool new_value isKnotRegistered[KEY bytes32 a] STORAGE {
 
 invariant numberOfRegisteredKnotsIsNumberOfRegisteredKnots(bytes32 blsKey)
     numberOfRegisteredKnots() == number_registered_knots
-
+// end grouping */
 
 
 // invariant that after something is deregistered it can never receive ETH
@@ -299,8 +302,8 @@ rule registeringInactiveWillFail() {
     assert lastReverted;
 }
 
-// rule permissioned_registerKnotsToSyndicate(env e, bytes32 blsKey) {
-//     registerKnotsToSyndicate(e, blsKey);
+rule permissioned_registerKnotsToSyndicate(env e, bytes32 blsKey) {
+    registerKnotsToSyndicate(e, blsKey);
 
-
-// }
+    assert e.msg.sender == owner();
+}
