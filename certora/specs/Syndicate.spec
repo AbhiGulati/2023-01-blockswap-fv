@@ -76,8 +76,8 @@ methods {
     claimAsStaker(address,bytes32,bytes32)
     claimAsCollateralizedSLOTOwner(address,bytes32)
     claimAsCollateralizedSLOTOwner(address,bytes32,bytes32)
-    registerKnotsToSyndicate(bytes32)
-    registerKnotsToSyndicate(bytes32,bytes32)
+    registerKnotsToSyndicate(bytes32) envfree;
+    registerKnotsToSyndicate(bytes32,bytes32) envfree;
     addPriorityStakers(address)
     addPriorityStakers(address,address)
     batchUpdateCollateralizedSlotOwnersAccruedETH(bytes32)
@@ -273,3 +273,12 @@ invariant numberOfRegisteredKnotsIsNumberOfRegisteredKnots(bytes32 blsKey)
 // Hm I don't have any way to see the change since before `deRegisterKnots` was
 // called vs after.
 
+
+rule doubleRegisterWillFail() {
+    bytes32 blsKey;
+    registerKnotsToSyndicate(blsKey);
+
+    registerKnotsToSyndicate@withrevert(blsKey);
+
+    assert lastReverted;
+}
