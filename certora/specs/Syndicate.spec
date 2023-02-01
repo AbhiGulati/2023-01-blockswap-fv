@@ -134,7 +134,10 @@ rule canNotDeregisterUnregisteredKnot(method f) filtered {
     assert lastReverted, "deRegisterKnots must revert if knot is not registered";
 }
 
-
+/*
+ * A successful call to `unstake` in which the caller requests a positive amount
+ *  should result in an increase to the recipient's ETH balance.
+ */ 
 rule unstakingIncreasesSETHAmount() {
     env e;
     address _unclaimedETHRecipient; address _sETHRecipient;
@@ -174,10 +177,16 @@ rule totalEthReceivedMonotonicallyIncreases(method f) filtered {
 invariant addressZeroHasNoBalance()
     sETHToken.balanceOf(0) == 0
 
+/**
+ * Address 0 must have zero staked sETH balance.
+ */
 invariant addressZeroHasNoStakedBalance(bytes32 blsKey)
     getSETHStakedBalanceForKnot(blsKey, 0) == 0
 
-
+/*
+ * `getUnprocessedETHForAllCollateralizedSlot` should return the collateralized
+ *  unprocessed ETH divided by the number of knots
+ */ 
 rule getUnprocessedETHForAllCollateralizedSlot_dependsOnNumberOfKnots() {
     require numberOfRegisteredKnots() > 0;
 
@@ -189,6 +198,11 @@ rule getUnprocessedETHForAllCollateralizedSlot_dependsOnNumberOfKnots() {
     assert expected == actual;
 }
 
+/*
+ * When number of knots is > 0 and free floating shares > 0, after calling 
+ *  `updateAccruedETHPerShares` the "last seen" values should be same for 
+ *  collateralized and free floating.
+ */
 rule ethForSlotTypesIsEqualAfterUpdateAccrued() {
     require numberOfRegisteredKnots() > 0;
     require totalFreeFloatingShares() > 0;
@@ -198,7 +212,11 @@ rule ethForSlotTypesIsEqualAfterUpdateAccrued() {
     assert lastSeenETHPerCollateralizedSlotPerKnot() == lastSeenETHPerFreeFloating();
 }
 
-
+/*
+ * Amount of ETH received by staker after calling `claimAsStaker` is the same
+ *  regardless of whether `updateAccruedETHPerShares` is called immediately
+ *  prior.
+ */
 rule claimAsStakerUpdatesAccrued() {
     env e;
     address user;
@@ -217,6 +235,9 @@ rule claimAsStakerUpdatesAccrued() {
     assert userBalance1 == userBalance2;
 }
 
+/*
+ * Attempt to register a knot that is already registered will fail
+ */ 
 rule doubleRegisterWillFail() {
     env e;
     bytes32 blsKey;
@@ -227,6 +248,9 @@ rule doubleRegisterWillFail() {
     assert lastReverted;
 }
 
+/*
+ * Attempt to register an inactive knot that will fail
+ */
 rule registeringInactiveWillFail() {
     env e;
     bytes32 blsKey;
@@ -238,27 +262,43 @@ rule registeringInactiveWillFail() {
     assert lastReverted;
 }
 
+/*
+ * `registerKnotsToSyndicate` can only be called by owner
+ */
 rule permissioned_registerKnotsToSyndicate(env e, bytes32 blsKey) {
     registerKnotsToSyndicate(e, blsKey);
 
     assert e.msg.sender == owner();
 }
 
+/*
+ * `deRegisterKnots` can only be called by owner
+ */
 rule permissioned_deRegisterKnots(env e, bytes32 blsKey) {
     deRegisterKnots(e, blsKey);
     assert e.msg.sender == owner();
 }
 
+/*
+ * `addPriorityStakers` can only be called by owner
+ */
 rule permissioned_addPriorityStakers(env e, address user) {
     addPriorityStakers(e, user);
     assert e.msg.sender == owner();
 }
 
+/*
+ * `updatePriorityStakingBlock` can only be called by owner
+ */
 rule permissioned_updatePriorityStakingBlock(env e, uint256 endBlock) {
     updatePriorityStakingBlock(e, endBlock);
     assert e.msg.sender == owner();
 }
 
+/*
+ * An address that is not a priority staker cannot have stake before 
+ *  `priorityStakingEndBlock` (unless the block has been moved forward)
+ */
 invariant noWhitelistNoStake(env e, address user, bytes32 blsKey)
     e.block.number < priorityStakingEndBlock() && !isPriorityStaker(user) => getSETHStakedBalanceForKnot(blsKey, user) == 0
     filtered {
@@ -270,12 +310,42 @@ invariant noWhitelistNoStake(env e, address user, bytes32 blsKey)
         }
     }
 
+
+
+
+
+
+
 /*
  *******************************
  * Unverified or failing
  *******************************
  */
 
+
+
+/*
+ * Amount of ETH received by staker after calling `claimAsCollateralizedSLOTOwner` 
+ * is the same regardless of whether `updateAccruedETHPerShares` is called 
+ * immediately prior.
+ */
+rule claimAsCollateralizedSLOTOwnerUpdatesAccrued() {
+    env e;
+    address user;
+    bytes32 blsKey1;
+    bytes32 blsKey2;
+
+    storage init = lastStorage;
+
+    claimAsCollateralizedSLOTOwner(e, user, blsKey1, blsKey2);
+    uint userBalance1 = getETHBalance(user);
+
+    updateAccruedETHPerShares() at init;
+    claimAsCollateralizedSLOTOwner(e, user, blsKey1, blsKey2);
+    uint userBalance2 = getETHBalance(user);
+
+    assert userBalance1 == userBalance2;
+}
 
 
 
