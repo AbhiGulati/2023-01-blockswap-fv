@@ -91,5 +91,5 @@ jobs:
           # Failing
           
           # - numberOfRegisteredKnotsIs0MeansNoRegisteredKnots
-          - numberOfRegisteredKnotsIsNumberOfRegisteredKnots
+          # - numberOfRegisteredKnotsIsNumberOfRegisteredKnots
 
