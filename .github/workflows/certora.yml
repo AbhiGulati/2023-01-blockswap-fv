@@ -89,6 +89,7 @@ jobs:
 
 
           # Failing
+          - claimAsCollateralizedSLOTOwnerUpdatesAccrued
           
           # - numberOfRegisteredKnotsIs0MeansNoRegisteredKnots
           # - numberOfRegisteredKnotsIsNumberOfRegisteredKnots
