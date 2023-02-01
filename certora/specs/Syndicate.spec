@@ -347,7 +347,22 @@ rule claimAsCollateralizedSLOTOwnerUpdatesAccrued() {
     assert userBalance1 == userBalance2;
 }
 
+rule unstakeOnlyDecreasesTotalFreeFloatingSharesIfKnotStillActive() {
+    uint totalFreeFloatingSharesBefore = totalFreeFloatingShares();
 
+    env e;
+    address _unclaimedETHRecipient; address _sETHRecipient;
+    bytes32 blsKey; uint256 sETHAmount;
+
+    require sETHAmount > 0;
+    require _sETHRecipient != currentContract;
+
+    unstake(e, _unclaimedETHRecipient, _sETHRecipient, blsKey, sETHAmount);
+
+    uint totalFreeFloatingSharesAfter = totalFreeFloatingShares();
+
+    assert totalFreeFloatingSharesBefore == totalFreeFloatingSharesAfter <=> isNoLongerPartOfSyndicate(blsKey);
+}
 
 // invariant numberOfRegisteredKnotsIs0MeansNoRegisteredKnots(bytes32 blsKey)
 //     numberOfRegisteredKnots() == 0 => !isKnotRegistered(blsKey) || isNoLongerPartOfSyndicate(blsKey)
