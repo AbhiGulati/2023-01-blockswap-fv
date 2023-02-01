@@ -311,19 +311,6 @@ invariant noWhitelistNoStake(env e, address user, bytes32 blsKey)
     }
 
 
-
-
-
-
-
-/*
- *******************************
- * Unverified or failing
- *******************************
- */
-
-
-
 /*
  * Amount of ETH received by staker after calling `claimAsCollateralizedSLOTOwner` 
  * is the same regardless of whether `updateAccruedETHPerShares` is called 
@@ -347,6 +334,10 @@ rule claimAsCollateralizedSLOTOwnerUpdatesAccrued() {
     assert userBalance1 == userBalance2;
 }
 
+/*
+ * Unstaking only decreases the `totalFreeFloatingShares` iff the KNOT we 
+ *  are unstaking from is still active
+ */
 rule unstakeOnlyDecreasesTotalFreeFloatingSharesIfKnotStillActive() {
     uint totalFreeFloatingSharesBefore = totalFreeFloatingShares();
 
@@ -363,6 +354,17 @@ rule unstakeOnlyDecreasesTotalFreeFloatingSharesIfKnotStillActive() {
 
     assert totalFreeFloatingSharesBefore == totalFreeFloatingSharesAfter <=> isNoLongerPartOfSyndicate(blsKey);
 }
+
+
+/*
+ *******************************
+ * Unverified or failing
+ *******************************
+ */
+
+
+
+
 
 // invariant numberOfRegisteredKnotsIs0MeansNoRegisteredKnots(bytes32 blsKey)
 //     numberOfRegisteredKnots() == 0 => !isKnotRegistered(blsKey) || isNoLongerPartOfSyndicate(blsKey)

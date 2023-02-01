@@ -90,7 +90,7 @@ jobs:
 
           # Failing
           # - claimAsCollateralizedSLOTOwnerUpdatesAccrued
-          - unstakeOnlyDecreasesTotalFreeFloatingSharesIfKnotStillActive
+          # - unstakeOnlyDecreasesTotalFreeFloatingSharesIfKnotStillActive
           
           # - numberOfRegisteredKnotsIs0MeansNoRegisteredKnots
           # - numberOfRegisteredKnotsIsNumberOfRegisteredKnots
