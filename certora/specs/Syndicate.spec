@@ -355,6 +355,8 @@ rule unstakeOnlyDecreasesTotalFreeFloatingSharesIfKnotStillActive() {
     assert totalFreeFloatingSharesBefore == totalFreeFloatingSharesAfter <=> isNoLongerPartOfSyndicate(blsKey);
 }
 
+invariant notDeregisteredKnotHasNoLastAccumulatedETHPerFreeFloatingShare(bytes32 blsKey)
+    !isNoLongerPartOfSyndicate(blsKey) => lastAccumulatedETHPerFreeFloatingShare(blsKey) == 0
 
 /*
  *******************************
