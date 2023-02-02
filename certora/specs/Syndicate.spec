@@ -7,6 +7,8 @@ methods {
     getUnprocessedETHForAllCollateralizedSlot() returns (uint256) envfree;
     updateAccruedETHPerShares() envfree;
     updatePriorityStakingBlock(uint256);
+    previewUnclaimedETHAsFreeFloatingStaker(address, bytes32) returns (uint256) envfree;
+    getUnprocessedETHForAllFreeFloatingSlot() returns (uint256) envfree;
 
     // public variables
     owner() returns (address) envfree;
@@ -20,6 +22,7 @@ methods {
     isKnotRegistered(bytes32) returns (bool) envfree;
     priorityStakingEndBlock() returns (uint256) envfree;
     isPriorityStaker(address) returns (bool) envfree;
+    PRECISION() returns (uint256) envfree;
     // sETHTotalStakeForKnot(bytes32) returns (uint256) envfree;
     // sETHStakedBalanceForKnot() returns () envfree; // new getter needed
     // sETHUserClaimForKnot() returns () envfree; // new getter needed
@@ -33,6 +36,7 @@ methods {
     // added harness calls
     getSETHStakedBalanceForKnot(bytes32, address) returns (uint256) envfree;
     getIsActiveKnot(bytes32) returns (bool) envfree;
+    getSETHUserClaimForKnot(bytes32, address) returns (uint256) envfree;
 
 
     //// Resolving external calls
@@ -355,8 +359,67 @@ rule unstakeOnlyDecreasesTotalFreeFloatingSharesIfKnotStillActive() {
     assert totalFreeFloatingSharesBefore == totalFreeFloatingSharesAfter <=> isNoLongerPartOfSyndicate(blsKey);
 }
 
+/*
+ *  A KNOT which has not yet been deRegistered will not have a value 
+ *   set for lastAccumulatedETHPerFreeFloatingShare
+ */ 
 invariant notDeregisteredKnotHasNoLastAccumulatedETHPerFreeFloatingShare(bytes32 blsKey)
     !isNoLongerPartOfSyndicate(blsKey) => lastAccumulatedETHPerFreeFloatingShare(blsKey) == 0
+
+/*
+ *  The lastAccumulatedETHPerFreeFloatingShare for any KNOT is always less than
+ *   the global accumulatedETHPerFreeFloatingShare
+ */
+invariant accumulatedETHPerFreeFloatingShare_gt_lastAccumulatedETHPerFreeFloatingShare(bytes32 blsKey)
+    lastAccumulatedETHPerFreeFloatingShare(blsKey) <= accumulatedETHPerFreeFloatingShare()
+
+
+/*
+ * accumulatedETHPerFreeFloatingShare increases monotonically
+ */
+rule accumulatedETHPerFreeFloatingShareMonotonicallyIncreases(method f) filtered {
+    f -> notHarnessCall(f)
+}{
+    uint256 _accumulatedETHPerFreeFloatingShare = accumulatedETHPerFreeFloatingShare();
+
+    env e; calldataarg args;
+    f(e, args);
+
+    uint256 accumulatedETHPerFreeFloatingShare_ = accumulatedETHPerFreeFloatingShare();
+
+    assert accumulatedETHPerFreeFloatingShare_ >= _accumulatedETHPerFreeFloatingShare, "accumulatedETHPerFreeFloatingShare must not decrease";
+}
+
+/*
+ * accumulatedETHPerCollateralizedSlotPerKnot increases monotonically
+ */
+rule accumulatedETHPerCollateralizedSlotPerKnotMonotonicallyIncreases(method f) filtered {
+    f -> notHarnessCall(f)
+}{
+    uint256 _accumulatedETHPerCollateralizedSlotPerKnot = accumulatedETHPerCollateralizedSlotPerKnot();
+
+    env e; calldataarg args;
+    f(e, args);
+
+    uint256 accumulatedETHPerCollateralizedSlotPerKnot_ = accumulatedETHPerCollateralizedSlotPerKnot();
+
+    assert accumulatedETHPerCollateralizedSlotPerKnot_ >= _accumulatedETHPerCollateralizedSlotPerKnot, "accumulatedETHPerCollateralizedSlotPerKnot must not decrease";
+}
+
+
+ghost mapping(bytes32 => uint256) sumOfStakesForKnot {
+    init_state axiom forall bytes32 blsKey.
+        sumOfStakesForKnot[blsKey] == 0;
+}
+
+hook Sstore sETHStakedBalanceForKnot[KEY bytes32 a][KEY address b] uint256 new_value (uint256 old_value) STORAGE {
+    sumOfStakesForKnot[a] = sumOfStakesForKnot[a] + new_value - old_value;
+}
+/*
+ * Sum of stakes for all stakers in KNOT equals `sETHTotalStakeForKnot`
+ */
+invariant totalStakeForKnotEqualsSumOfStakesBalances(bytes32 blsKey)
+    sumOfStakesForKnot[blsKey] == sETHTotalStakeForKnot(blsKey)
 
 /*
  *******************************

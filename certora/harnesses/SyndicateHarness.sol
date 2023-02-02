@@ -146,5 +146,9 @@ contract SyndicateHarness is Syndicate {
 
         return isActive;
     }
+
+    function getSETHUserClaimForKnot(blsKey blsPubKey, address user) public view returns (uint) {
+        return sETHUserClaimForKnot[blsPubKey][user];
+    }
 }
 
