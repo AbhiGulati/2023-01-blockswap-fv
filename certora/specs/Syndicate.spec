@@ -141,6 +141,7 @@ rule canNotDeregisterUnregisteredKnot(method f) filtered {
 /*
  * A successful call to `unstake` in which the caller requests a positive amount
  *  should result in an increase to the recipient's ETH balance.
+ * Note: This rule fails when bug1.patch is applied
  */ 
 rule unstakingIncreasesSETHAmount() {
     env e;
@@ -189,7 +190,8 @@ invariant addressZeroHasNoStakedBalance(bytes32 blsKey)
 
 /*
  * `getUnprocessedETHForAllCollateralizedSlot` should return the collateralized
- *  unprocessed ETH divided by the number of knots
+ *   unprocessed ETH divided by the number of knots
+ * Note: This rule fails when bug5.patch is applied
  */ 
 rule getUnprocessedETHForAllCollateralizedSlot_dependsOnNumberOfKnots() {
     require numberOfRegisteredKnots() > 0;
@@ -406,7 +408,6 @@ rule accumulatedETHPerCollateralizedSlotPerKnotMonotonicallyIncreases(method f) 
     assert accumulatedETHPerCollateralizedSlotPerKnot_ >= _accumulatedETHPerCollateralizedSlotPerKnot, "accumulatedETHPerCollateralizedSlotPerKnot must not decrease";
 }
 
-
 ghost mapping(bytes32 => uint256) sumOfStakesForKnot {
     init_state axiom forall bytes32 blsKey.
         sumOfStakesForKnot[blsKey] == 0;
@@ -415,11 +416,37 @@ ghost mapping(bytes32 => uint256) sumOfStakesForKnot {
 hook Sstore sETHStakedBalanceForKnot[KEY bytes32 a][KEY address b] uint256 new_value (uint256 old_value) STORAGE {
     sumOfStakesForKnot[a] = sumOfStakesForKnot[a] + new_value - old_value;
 }
+
 /*
  * Sum of stakes for all stakers in KNOT equals `sETHTotalStakeForKnot`
  */
 invariant totalStakeForKnotEqualsSumOfStakesBalances(bytes32 blsKey)
     sumOfStakesForKnot[blsKey] == sETHTotalStakeForKnot(blsKey)
+
+/*
+ * Check that user's sETH claim is set according to their new staked balance
+ * Note: This rule fails when bug9.patch is applied
+ */
+rule unstakeUpdatesSETHUserClaimForKnot() {
+    env e;
+    address _unclaimedETHRecipient; address _sETHRecipient;
+    bytes32 blsKey; uint256 sETHAmount;
+
+    requireInvariant totalStakeForKnotEqualsSumOfStakesBalances(blsKey);
+    requireInvariant notDeregisteredKnotHasNoLastAccumulatedETHPerFreeFloatingShare(blsKey);
+
+    require totalFreeFloatingShares() > 0;
+    require numberOfRegisteredKnots() > 0;
+    require !isNoLongerPartOfSyndicate(blsKey);
+    require sETHAmount > 0;
+    require _sETHRecipient != currentContract;
+    require(e.msg.sender != 0);
+
+    unstake(e, _unclaimedETHRecipient, _sETHRecipient, blsKey, sETHAmount);
+
+    assert getSETHUserClaimForKnot(blsKey, e.msg.sender) == accumulatedETHPerFreeFloatingShare() * getSETHStakedBalanceForKnot(blsKey, e.msg.sender) / PRECISION();
+    assert previewUnclaimedETHAsFreeFloatingStaker(e.msg.sender, blsKey) == 0;
+}
 
 /*
  *******************************
