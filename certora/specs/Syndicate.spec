@@ -462,7 +462,7 @@ rule unstakeUpdatesSETHUserClaimForKnot() {
 //     numberOfRegisteredKnots() == 0 => !isKnotRegistered(blsKey) || isNoLongerPartOfSyndicate(blsKey)
 
 
-
+/*
 ghost mathint number_registered_knots {
     init_state axiom number_registered_knots == 0;
 }
@@ -478,14 +478,14 @@ hook Sstore isNoLongerPartOfSyndicate[KEY bytes32 a] bool new_value (bool old_va
         ? number_registered_knots - 1
         : (!new_value && old_value && is_KnotRegistered[a]
             ? number_registered_knots + 1
-            : number_registered_knots);
+            : number_registered_knots); */
     // if (new_value && !old_value && is_KnotRegistered[a]) {
     //     number_registered_knots = number_registered_knots - 1;
     // } else if (!new_value && old_value && is_KnotRegistered[a]) {
     //     number_registered_knots = number_registered_knots + 1;
     // }
-}
-
+//}
+/*
 hook Sload bool new_value isNoLongerPartOfSyndicate[KEY bytes32 a] STORAGE {
     is_NoLongerPartOfSyndicate[a] = new_value;
 }
@@ -497,21 +497,21 @@ hook Sstore isKnotRegistered[KEY bytes32 a] bool new_value (bool old_value) STOR
         ? number_registered_knots + 1
         : (!new_value && old_value && !is_NoLongerPartOfSyndicate[a]
             ? number_registered_knots - 1
-            : number_registered_knots);
+            : number_registered_knots); */
     // if (new_value && !old_value && !is_NoLongerPartOfSyndicate[a]) {
     //     number_registered_knots = number_registered_knots + 1;
     // } else if (!new_value && old_value && !is_NoLongerPartOfSyndicate[a]) {
     //     number_registered_knots = number_registered_knots - 1;
     // }
-}
-
+//}
+/*
 hook Sload bool new_value isKnotRegistered[KEY bytes32 a] STORAGE {
     is_KnotRegistered[a] = new_value;
 }
 
 invariant numberOfRegisteredKnotsIsNumberOfRegisteredKnots(bytes32 blsKey)
     numberOfRegisteredKnots() == number_registered_knots
-
+*/
 
 
 // invariant that after something is deregistered it can never receive ETH
