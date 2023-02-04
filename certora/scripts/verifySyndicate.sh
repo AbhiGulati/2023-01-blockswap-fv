@@ -10,7 +10,6 @@ certoraRun  certora/harnesses/SyndicateHarness.sol \
     --optimistic_loop \
     --optimize 1 \
     --loop_iter 3 \
-    $RULE \
     --rule_sanity \
     --settings -optimisticFallback=true \
     --packages @blockswaplab=node_modules/@blockswaplab @openzeppelin=node_modules/@openzeppelin \
