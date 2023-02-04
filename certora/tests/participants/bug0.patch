@@ -1,0 +1,14 @@
+diff --git a/certora/munged/syndicate/Syndicate.sol b/certora/munged/syndicate/Syndicate.sol
+index 5833b81..44fc002 100644
+--- a/certora/munged/syndicate/Syndicate.sol
++++ b/certora/munged/syndicate/Syndicate.sol
+@@ -692,8 +692,7 @@ contract Syndicate is ISyndicateInit, Initializable, Ownable, ReentrancyGuard, S
+         if (_recipient == address(0)) revert ZeroAddress();
+         if (_recipient == address(this)) revert ZeroAddress();
+ 
+-        // Make sure we have the latest accrued information
+-        updateAccruedETHPerShares();
++
+ 
+         uint256 totalToTransfer;
+         for (uint256 i; i < numOfKeys; ++i) {

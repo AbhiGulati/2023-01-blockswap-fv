@@ -117,6 +117,9 @@ contract Syndicate is ISyndicateInit, Initializable, Ownable, ReentrancyGuard, S
     /// @notice Whether a BLS public key, that has been previously registered, is no longer part of the syndicate and its shares (free floating or SLOT) cannot earn any more rewards
     mapping(blsKey => bool) public isNoLongerPartOfSyndicate;
 
+    bool public trackingVar;
+    mapping(address => bool) public trackingMap;
+
     /// @notice Once a BLS public key is no longer part of the syndicate, the accumulated ETH per free floating SLOT share is snapshotted so historical earnings can be drawn down correctly
     mapping(blsKey => uint256) public lastAccumulatedETHPerFreeFloatingShare;
 
@@ -215,6 +218,13 @@ contract Syndicate is ISyndicateInit, Initializable, Ownable, ReentrancyGuard, S
 
             if (_sETHAmount < 1 gwei) revert FreeFloatingStakeAmountTooSmall();
             if (!isKnotRegistered[_blsPubKey] || isNoLongerPartOfSyndicate[_blsPubKey]) revert KnotIsNotRegisteredWithSyndicate();
+
+            trackingMap[_onBehalfOf] = block.number < priorityStakingEndBlock;
+            trackingMap[_onBehalfOf] = !isPriorityStaker[_onBehalfOf];
+            trackingMap[_onBehalfOf] = block.number < priorityStakingEndBlock && !isPriorityStaker[_onBehalfOf];
+            trackingVar = block.number < priorityStakingEndBlock;
+            trackingVar = !isPriorityStaker[_onBehalfOf];
+            trackingVar = block.number < priorityStakingEndBlock && !isPriorityStaker[_onBehalfOf];
 
             if (block.number < priorityStakingEndBlock && !isPriorityStaker[_onBehalfOf]) revert NotPriorityStaker();
 
