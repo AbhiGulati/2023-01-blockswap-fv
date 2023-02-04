@@ -1,17 +1,3 @@
-#!/bin/sh
-
-f="certora/tests/certora/bug9.patch"
-
-if [[ "$1" ]]
-then
-    MSG="$1"
-else
-    MSG="msg"
-fi
-
-echo "Applying $f"
-git apply $f;
-echo "Running script"
 
 certoraRun  certora/harnesses/SyndicateHarness.sol \
     certora/harnesses/MockStakeHouseUniverse.sol \
@@ -27,8 +13,3 @@ certoraRun  certora/harnesses/SyndicateHarness.sol \
     --rule_sanity \
     --settings -optimisticFallback=true \
     --packages @blockswaplab=node_modules/@blockswaplab @openzeppelin=node_modules/@openzeppelin \
-    --msg "$MSG" \
-    $3
-
-echo "Reverting $f"
-git apply -R $f
